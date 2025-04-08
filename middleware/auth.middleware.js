@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
-
-const authenticateToken = (req, res, next) => {
+const User = require('../models/user.model');
+const authenticateToken = async (req, res, next) => {
   // Get token from Authorization header
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1]; // Expected: "Bearer <token>"
@@ -10,11 +10,15 @@ const authenticateToken = (req, res, next) => {
   }
 
   // Verify token
-  jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret', (err, user) => {
+  jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret', async(err, user) => {
     if (err) {
       return res.status(403).json({ message: 'Invalid or expired token' });
     }
     // Attach user info to request
+    let userData=await User.findById(user._id);
+    if(!userData){
+      return res.status(404).json({ message: 'User not found' });
+    }
     req.body.user = user;
     next();
   });

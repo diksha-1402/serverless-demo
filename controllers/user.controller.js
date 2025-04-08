@@ -32,7 +32,7 @@ const createUser = async (req, res) => {
 // Get all users
 const getUsers = async (req, res) => {
   try {
-    const users = await User.find().lean().select("_id name email createdAt");
+    const users = await User.find().lean().select("_id name image email createdAt");
     if(users.length==0){
         return res.status(404).json({message:"No Record Found"});
     }
@@ -71,6 +71,8 @@ const loginUser = async (req, res) => {
       data: {
         name: user.name,
         email: user.email,
+        image: user.image,
+        createdAt: user.createdAt,
       },
     });
   } catch (error) {
@@ -82,7 +84,7 @@ const loginUser = async (req, res) => {
 // Get all users
 const getUserDetail = async (req, res) => {
   try {
-    const user = await User.findOne({_id:req.body.user._id}).select("_id name email createdAt");
+    const user = await User.findOne({_id:req.body.user._id}).select("_id name email image createdAt");
     if(!user){
         return res.status(404).json({message:"No Record Found"});
     }
@@ -121,11 +123,34 @@ const deleteUser = async (req, res) => {
     return res.status(500).json({ message: 'Server error' });
   }
 };
+
+// upload image
+const uploadImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+    // Save file path to the database
+    const user = await User.findByIdAndUpdate(
+      req.body.user._id,
+      { image: req.file.path },
+      { new: true }
+    );
+   
+    return res.status(200).json({
+      message: 'Image uploaded successfully',
+      imageUrl: req.file.path,
+    });
+  } catch (err) {
+    return res.status(500).json({ error: 'Upload failed', details: err });
+  }
+};
 module.exports = {
   createUser,
   getUsers,
   loginUser,
   getUserDetail,
   editUserDetail,
-  deleteUser
+  deleteUser,
+  uploadImage
 };

@@ -13,7 +13,11 @@ provider:
 functions:
   api:
     handler: handler.handler
+    timeout: 30  # 👈 increase this from default 6s
     events:
+      - httpApi: 
+          path: api/upload
+          method: post
       - httpApi: 
           path: api/user-create
           method: post
