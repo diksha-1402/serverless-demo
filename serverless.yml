@@ -1,0 +1,46 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: codewave2025
+# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
+app: nodeexpressserverlessapp
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: nodeexpressserverlessapp
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  httpApi:
+    payload: '2.0'  # ✅ important for clean JSON body
+functions:
+  api:
+    handler: handler.handler
+    events:
+      - httpApi: 
+          path: api/user-create
+          method: post
+      - httpApi: 
+          path: api/user-listing
+          method: get
+      - httpApi: 
+          path: api/login
+          method: post
+      - httpApi: 
+          path: api/user-edit
+          method: patch
+      - httpApi: 
+          path: api/user-detail
+          method: get
+      - httpApi: 
+          path: api/user-delete
+          method: delete
+      - httpApi: 
+          path: test
+          method: get
+      - httpApi: 
+          path: api/{proxy+}
+          method: any
+plugins:
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    port: 3000
