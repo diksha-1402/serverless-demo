@@ -48,3 +48,4 @@ plugins:
 custom:
   serverless-offline:
     port: 3000
+    lambdaPort: 3005
